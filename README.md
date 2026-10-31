@@ -75,6 +75,9 @@ The manifest grants `llm.complete` because the current local harness routes
 Executa reverse sampling through the same Host API ACL as iframe calls. The
 frontend does not call `anna.llm.*`; a regression test enforces that boundary.
 
+At runtime, the UI prefers a generated `anna-tool-ids.js` mapping when the
+host provides one and otherwise falls back to the local development tool ID.
+
 In the harness RPC log, creating or deleting a note shows `storage.set` and
 reloading the iframe shows `storage.get`. Summarize shows `tools.invoke`.
 

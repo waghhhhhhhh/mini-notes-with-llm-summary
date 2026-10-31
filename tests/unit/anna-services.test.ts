@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadNotes, saveNotes } from "../../src/anna/notes-service";
 import type { AnnaRuntime } from "../../src/anna/runtime";
 import { summarizeNotes } from "../../src/anna/tools-service";
@@ -33,6 +33,14 @@ const document: NotesDocument = {
     },
   ],
 };
+
+afterEach(() => {
+  delete (
+    globalThis as typeof globalThis & {
+      __ANNA_TOOL_IDS__?: Record<string, string>;
+    }
+  ).__ANNA_TOOL_IDS__;
+});
 
 describe("Anna services", () => {
   it("loads notes through storage.get and preserves the etag", async () => {
@@ -93,6 +101,28 @@ describe("Anna services", () => {
       timeoutMs: 80_000,
     });
     expect(summary).toBe("A customer follow-up and a login bug fix.");
+  });
+
+  it("uses the published tool id when a sidecar provides one", async () => {
+    (
+      globalThis as typeof globalThis & {
+        __ANNA_TOOL_IDS__?: Record<string, string>;
+      }
+    ).__ANNA_TOOL_IDS__ = {
+      "mini-notes-summarizer": "tool-live-mini-notes-summarizer-12345678",
+    };
+    const { runtime, invoke } = createRuntime();
+    invoke.mockResolvedValue({
+      success: true,
+      data: { summary: "Published summary." },
+    });
+
+    await expect(summarizeNotes(runtime, document)).resolves.toBe(
+      "Published summary.",
+    );
+    expect(invoke.mock.calls[0][0].tool_id).toBe(
+      "tool-live-mini-notes-summarizer-12345678",
+    );
   });
 
   it("surfaces nested tool failures", async () => {

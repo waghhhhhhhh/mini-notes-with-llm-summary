@@ -54,6 +54,10 @@ class ExecutaManifestContractTest(unittest.TestCase):
             f'SUMMARIZER_TOOL_ID = "{tool_id}"',
             frontend_model,
         )
+        self.assertIn(
+            'SUMMARIZER_HANDLE = "mini-notes-summarizer"',
+            frontend_model,
+        )
 
         spec = importlib.util.spec_from_file_location(
             "mini_notes_summarizer_contract",

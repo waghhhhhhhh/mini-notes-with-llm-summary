@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import signal
 import socket
@@ -177,6 +178,27 @@ class HarnessIntegrationTest(unittest.TestCase):
             "harness started with --no-llm",
             invoked["error"]["message"],
         )
+
+
+class BundleBootstrapTest(unittest.TestCase):
+    def test_tool_id_sidecar_loads_before_main_bundle(self) -> None:
+        entry = ROOT / "bundle" / "index.html"
+        self.assertTrue(entry.is_file(), "run pnpm build before this test")
+        source = entry.read_text(encoding="utf-8")
+        module_match = re.search(
+            r'<script[^>]+type="module"[^>]+src="([^"]+)"',
+            source,
+        )
+        self.assertIsNotNone(module_match)
+
+        module_path = ROOT / "bundle" / module_match.group(1).removeprefix("./")
+        self.assertTrue(module_path.is_file())
+        bootstrap = module_path.read_text(encoding="utf-8")
+        sidecar_index = bootstrap.find("anna-tool-ids.js")
+        main_index = bootstrap.rfind("main-")
+        self.assertGreaterEqual(sidecar_index, 0)
+        self.assertGreaterEqual(main_index, 0)
+        self.assertLess(sidecar_index, main_index)
 
 
 if __name__ == "__main__":

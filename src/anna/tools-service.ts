@@ -1,6 +1,10 @@
 import type { AnnaRuntime } from "./runtime";
 import { unwrapHostResult } from "./runtime";
-import { SUMMARIZER_TOOL_ID, notesSnapshot, type NotesDocument } from "../notes/model";
+import {
+  notesSnapshot,
+  resolveSummarizerToolId,
+  type NotesDocument,
+} from "../notes/model";
 
 function findSummary(value: unknown): string | undefined {
   if (!value || typeof value !== "object") {
@@ -55,7 +59,7 @@ export async function summarizeNotes(
   document: NotesDocument,
 ): Promise<string> {
   const response = await anna.tools.invoke({
-    tool_id: SUMMARIZER_TOOL_ID,
+    tool_id: resolveSummarizerToolId(),
     method: "summarize",
     args: {
       notes: notesSnapshot(document),
@@ -75,4 +79,3 @@ export async function summarizeNotes(
 
   return summary;
 }
-

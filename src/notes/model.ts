@@ -1,5 +1,21 @@
 export const NOTES_KEY = "notes";
-export const SUMMARIZER_TOOL_ID = "tool-dev-mini-notes-summarizer";
+export const SUMMARIZER_HANDLE = "mini-notes-summarizer";
+export const DEV_SUMMARIZER_TOOL_ID = "tool-dev-mini-notes-summarizer";
+export const SUMMARIZER_TOOL_ID = DEV_SUMMARIZER_TOOL_ID;
+
+interface ToolIdGlobal {
+  __ANNA_TOOL_IDS__?: Record<string, string>;
+}
+
+export function resolveSummarizerToolId(
+  scope: object = globalThis,
+): string {
+  const toolIds = (scope as ToolIdGlobal).__ANNA_TOOL_IDS__;
+  const injected = toolIds?.[SUMMARIZER_HANDLE];
+  return typeof injected === "string" && injected.trim()
+    ? injected.trim()
+    : DEV_SUMMARIZER_TOOL_ID;
+}
 
 export interface Note {
   id: string;
@@ -97,4 +113,3 @@ export function notesSnapshot(document: NotesDocument) {
 export function normalizeNotesDocument(value: unknown): NotesDocument {
   return normalizeDocument(value);
 }
-
