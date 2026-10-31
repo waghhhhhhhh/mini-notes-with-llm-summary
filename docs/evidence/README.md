@@ -30,3 +30,12 @@ The committed screenshot was captured by that test after the full interaction:
   responses.
 - `tests/verify_release_assets.py` checks the three release archives, including
   their root `manifest.json`, version, and entrypoint.
+
+The public `v0.1.0` Release contains all three assets. They were downloaded from
+the published Release, matched the GitHub-reported SHA-256 digests, and both
+macOS archives contain:
+
+```text
+bin/mini-notes-summarizer
+manifest.json
+```
