@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -22,10 +22,39 @@ const child = spawn(
       UV_TOOL_BIN_DIR: path.join(cache, "uv-bin"),
     },
     stdio: "inherit",
+    detached: process.platform !== "win32",
   },
 );
 
+let stopping = false;
+
+function stopChild(signal) {
+  if (stopping || child.exitCode !== null) {
+    return;
+  }
+  stopping = true;
+  if (process.platform === "win32") {
+    spawnSync(
+      "taskkill",
+      ["/PID", String(child.pid), "/T", "/F"],
+      { stdio: "ignore" },
+    );
+  } else {
+    process.kill(-child.pid, signal);
+  }
+}
+
+process.on("SIGINT", () => {
+  stopChild("SIGINT");
+});
+process.on("SIGTERM", () => {
+  stopChild("SIGTERM");
+});
+
 child.on("exit", (code, signal) => {
+  if (stopping) {
+    process.exit(0);
+  }
   if (signal) {
     process.kill(process.pid, signal);
     return;

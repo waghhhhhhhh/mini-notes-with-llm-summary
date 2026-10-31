@@ -18,7 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 EXECUTA_DIR = ROOT / "executas" / "mini-notes-summarizer"
 DIST_DIR = EXECUTA_DIR / "dist"
 TOOL_ID = "tool-dev-mini-notes-summarizer"
-DEFAULT_TOOL_VERSION = "0.1.0"
+DEFAULT_TOOL_VERSION = (EXECUTA_DIR / "version.txt").read_text(
+    encoding="utf-8"
+).strip()
 VERSION_PATTERN = re.compile(
     r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
     r"(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$"

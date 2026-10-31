@@ -64,6 +64,8 @@ class HarnessIntegrationTest(unittest.TestCase):
                     capture_output=True,
                     check=False,
                     text=True,
+                    encoding="utf-8",
+                    errors="replace",
                 )
             else:
                 os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)

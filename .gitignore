@@ -11,5 +11,7 @@ __pycache__/
 .venv/
 *.egg-info/
 .pytest_cache/
+playwright-report/
+test-results/
 .DS_Store
 Anna-1.1.0-beta.46+staging.81ac05a6-windows-x86_64/

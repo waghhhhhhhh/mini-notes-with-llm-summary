@@ -77,6 +77,11 @@ jobs:
           echo "EXECUTA_VERSION=$version" >> "$GITHUB_ENV"
       - run: uv venv .venv --python 3.12 --no-python-downloads
       - run: uv sync --no-python-downloads
+      - name: Synchronize release metadata
+        shell: bash
+        run: |
+          python scripts/prepare_release.py --version "$EXECUTA_VERSION"
+          python scripts/prepare_release.py --check --version "$EXECUTA_VERSION"
       - name: Build and smoke-test binary
         shell: bash
         run: |

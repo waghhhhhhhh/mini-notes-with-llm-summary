@@ -14,10 +14,12 @@
     "validate": "anna-app validate --strict",
     "anna:dev": "node scripts/anna-dev.mjs",
     "executa:dev": "node scripts/anna-executa-dev.mjs",
-    "test": "pnpm test:unit && pnpm test:executa && pnpm test:harness",
+    "test": "pnpm test:unit && pnpm test:executa && pnpm test:versions && pnpm test:harness && pnpm test:browser",
     "test:unit": "vitest run",
     "test:executa": "node scripts/run-python.mjs -m unittest discover -s tests -p \"test_executa*.py\"",
+    "test:versions": "node scripts/run-python.mjs scripts/prepare_release.py --check",
     "test:harness": "pnpm build && node scripts/run-python.mjs -m unittest discover -s tests -p \"test_harness.py\"",
+    "test:browser": "pnpm build && playwright test",
     "build:binary": "node scripts/run-python.mjs scripts/build_binary.py"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@anna-ai/cli": "0.1.63",
+    "@playwright/test": "1.64.1",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
