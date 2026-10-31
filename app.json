@@ -1,0 +1,9 @@
+{
+  "name": "Mini Notes",
+  "slug": "mini-notes-with-llm-summary",
+  "tagline": "Capture notes and summarize them with Anna.",
+  "description": "A small notes workspace backed by Anna storage, with summaries generated through a bundled Executa and host sampling.",
+  "category": "productivity",
+  "version": "0.1.0"
+}
+

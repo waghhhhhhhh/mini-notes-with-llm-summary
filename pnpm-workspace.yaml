@@ -1,0 +1,10 @@
+packages:
+  - .
+storeDir: .pnpm-store
+cacheDir: .pnpm-cache
+virtualStoreDir: node_modules/.pnpm
+minimumReleaseAgeExclude:
+  - '@anna-ai/app-runtime@0.27.0'
+  - '@anna-ai/app-schema@0.32.0'
+  - '@anna-ai/cli@0.1.63'
+  - lucide-react@1.65.0

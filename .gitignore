@@ -1,0 +1,15 @@
+node_modules/
+bundle/
+dist/
+.vite/
+.npmrc.local
+.pnpm-store/
+.pnpm-cache/
+.cache/
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.DS_Store
+Anna-1.1.0-beta.46+staging.81ac05a6-windows-x86_64/
