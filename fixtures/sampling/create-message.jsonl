@@ -1,0 +1,2 @@
+{"ns":"sampling","method":"createMessage","match":{"contentIncludes":"Follow up with the customer"},"result":{"role":"assistant","content":{"type":"text","text":"The open work is a customer follow-up and a login bug fix. The customer follow-up is the nearest action item, followed by investigating the login issue."},"model":"fixture-model","stopReason":"endTurn","usage":{"inputTokens":42,"outputTokens":28,"totalTokens":70}}}
+
