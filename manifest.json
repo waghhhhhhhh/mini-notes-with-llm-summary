@@ -54,6 +54,9 @@
       ],
       "tools": [
         "required:tool-dev-mini-notes-summarizer"
+      ],
+      "llm": [
+        "complete"
       ]
     }
   },
@@ -67,4 +70,3 @@
     }
   }
 }
-
