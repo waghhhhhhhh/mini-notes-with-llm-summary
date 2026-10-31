@@ -109,8 +109,10 @@ sampling error:
 
 ![Mini Notes harness evidence](docs/evidence/mini-notes-harness.png)
 
-The stdlib protocol test verifies `initialize`, `describe`, `invoke`, and the
-reverse sampling response path without an Anna account:
+The stdlib protocol tests verify `initialize`, `describe`, `invoke`, concurrent
+invokes, out-of-order sampling responses, and identity consistency across the
+App manifest, frontend constant, Executa config, and plugin manifest without an
+Anna account:
 
 ```bash
 pnpm test:executa
@@ -155,9 +157,9 @@ the summary themselves.
 
 ## Binary packaging
 
-The build script detects the native platform, builds a PyInstaller executable,
-adds the install `manifest.json`, creates the required archive, and runs a
-JSON-RPC smoke test:
+The build script detects the native platform, checks that all source versions
+match, builds a PyInstaller executable, adds the install `manifest.json`,
+creates the required archive, and runs a JSON-RPC smoke test:
 
 ```bash
 pnpm build:binary

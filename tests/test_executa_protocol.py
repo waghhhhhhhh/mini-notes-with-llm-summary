@@ -158,6 +158,78 @@ class ExecutaProtocolTest(unittest.TestCase):
         self.assertTrue(final["result"]["success"])
         self.assertIn("customer follow-up", final["result"]["data"]["summary"])
 
+    def test_concurrent_invokes_route_out_of_order_sampling_responses(self) -> None:
+        initialize_id = self.send(
+            "initialize",
+            {
+                "protocolVersion": "2.0",
+                "capabilities": {"sampling": {"modalities": ["text"]}},
+            },
+        )
+        self.assertEqual(self.read()["id"], initialize_id)
+
+        invoke_ids = [
+            self.send(
+                "invoke",
+                {
+                    "tool": "summarize",
+                    "arguments": {
+                        "notes": [
+                            {
+                                "seq": 1,
+                                "text": f"Concurrent note {index}",
+                            }
+                        ]
+                    },
+                    "context": {"invoke_id": f"concurrent-{index}"},
+                },
+            )
+            for index in (1, 2)
+        ]
+
+        sampling_requests = [self.read(), self.read()]
+        self.assertTrue(
+            all(
+                request.get("method") == "sampling/createMessage"
+                for request in sampling_requests
+            )
+        )
+
+        assert self.process.stdin is not None
+        for request in reversed(sampling_requests):
+            invoke_id = request["params"]["metadata"]["executa_invoke_id"]
+            self.process.stdin.write(
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": request["id"],
+                        "result": {
+                            "role": "assistant",
+                            "content": {
+                                "type": "text",
+                                "text": f"Summary for {invoke_id}",
+                            },
+                            "model": "fixture-model",
+                        },
+                    }
+                )
+                + "\n"
+            )
+            self.process.stdin.flush()
+
+        responses: dict[int, dict[str, Any]] = {}
+        for _ in range(2):
+            response = self.read()
+            responses[response["id"]] = response
+        self.assertEqual(set(responses), set(invoke_ids))
+        self.assertEqual(
+            {response["result"]["data"]["summary"] for response in responses.values()},
+            {
+                "Summary for concurrent-1",
+                "Summary for concurrent-2",
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

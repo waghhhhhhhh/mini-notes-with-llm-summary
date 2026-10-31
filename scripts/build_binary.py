@@ -69,8 +69,15 @@ def _install_manifest(version: str) -> dict:
 def _build_binary(version: str) -> Path:
     raw_dir = DIST_DIR / "raw"
     work_dir = DIST_DIR / "work"
+    temp_root = ROOT / ".cache" / "tmp"
+    user_base = ROOT / ".cache" / "python-user-base"
     raw_dir.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="mini-notes-version-") as temp_dir:
+    temp_root.mkdir(parents=True, exist_ok=True)
+    user_base.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        prefix="mini-notes-version-",
+        dir=temp_root,
+    ) as temp_dir:
         version_file = Path(temp_dir) / "version.txt"
         version_file.write_text(f"{version}\n", encoding="utf-8")
         command = [
@@ -94,6 +101,10 @@ def _build_binary(version: str) -> Path:
         ]
         env = os.environ.copy()
         env["PYINSTALLER_CONFIG_DIR"] = str(ROOT / ".cache" / "pyinstaller")
+        env["PYTHONNOUSERSITE"] = "1"
+        env["PYTHONUSERBASE"] = str(user_base)
+        env["TEMP"] = str(temp_root)
+        env["TMP"] = str(temp_root)
         subprocess.run(command, cwd=EXECUTA_DIR, env=env, check=True)
 
     suffix = ".exe" if platform.system().lower() == "windows" else ""
@@ -174,6 +185,17 @@ def main() -> None:
         )
     platform_key = args.platform or detected
     version = _normalize_version(args.version)
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "prepare_release.py"),
+            "--check",
+            "--version",
+            version,
+        ],
+        cwd=ROOT,
+        check=True,
+    )
 
     binary = _build_binary(version)
     stage_dir, staged_binary = _stage_binary(binary, platform_key, version)
