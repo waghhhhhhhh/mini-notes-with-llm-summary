@@ -14,7 +14,10 @@
     "validate": "anna-app validate --strict",
     "anna:dev": "node scripts/anna-dev.mjs",
     "executa:dev": "node scripts/anna-executa-dev.mjs",
-    "test:executa": "node scripts/run-python.mjs -m unittest discover -s tests -p \"test_*.py\"",
+    "test": "pnpm test:unit && pnpm test:executa && pnpm test:harness",
+    "test:unit": "vitest run",
+    "test:executa": "node scripts/run-python.mjs -m unittest discover -s tests -p \"test_executa*.py\"",
+    "test:harness": "pnpm build && node scripts/run-python.mjs -m unittest discover -s tests -p \"test_harness.py\"",
     "build:binary": "node scripts/run-python.mjs scripts/build_binary.py"
   },
   "dependencies": {
@@ -29,6 +32,7 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "6.1.2",
     "typescript": "7.0.2",
-    "vite": "8.3.5"
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
   }
 }
