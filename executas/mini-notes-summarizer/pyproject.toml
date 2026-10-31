@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-notes-summarizer"
+version = "0.1.0"
+description = "Anna Executa that summarizes Mini Notes through host sampling"
+requires-python = ">=3.11"
+
+[project.scripts]
+tool-dev-mini-notes-summarizer = "mini_notes_summarizer:main"
+
+[project.optional-dependencies]
+build = ["pyinstaller>=6.10"]
+
+[tool.setuptools]
+py-modules = ["mini_notes_summarizer"]
+

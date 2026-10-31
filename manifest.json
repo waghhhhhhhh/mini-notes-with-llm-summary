@@ -1,0 +1,70 @@
+{
+  "schema": 2,
+  "required_executas": [
+    {
+      "tool_id": "tool-dev-mini-notes-summarizer"
+    }
+  ],
+  "permissions": [
+    "storage.read",
+    "storage.write",
+    "tools.invoke"
+  ],
+  "host_capabilities": [
+    "aps.kv",
+    "llm.sample"
+  ],
+  "system_prompt_addendum": "Mini Notes is a lightweight note workspace. Use its Summarize tool when the user asks for a summary of the current notes.",
+  "tags": [
+    "notes",
+    "productivity",
+    "summary"
+  ],
+  "ui": {
+    "bundle": {
+      "format": "static-spa",
+      "entry": "index.html",
+      "external_origins": []
+    },
+    "views": [
+      {
+        "name": "main",
+        "title": "Mini Notes",
+        "default": true,
+        "entry": "index.html",
+        "min_size": {
+          "w": 420,
+          "h": 480
+        },
+        "default_size": {
+          "w": 760,
+          "h": 720
+        },
+        "max_size": {
+          "w": 1400,
+          "h": 1200
+        },
+        "single_instance": true
+      }
+    ],
+    "host_api": {
+      "storage": [
+        "get",
+        "set"
+      ],
+      "tools": [
+        "required:tool-dev-mini-notes-summarizer"
+      ]
+    }
+  },
+  "dev": {
+    "user_id": 1,
+    "seed_storage": {
+      "notes": {
+        "nextSeq": 1,
+        "notes": []
+      }
+    }
+  }
+}
+

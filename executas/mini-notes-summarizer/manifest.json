@@ -1,0 +1,32 @@
+{
+  "name": "tool-dev-mini-notes-summarizer",
+  "display_name": "Mini Notes Summarizer",
+  "version": "0.1.0",
+  "description": "Summarizes the current Mini Notes collection through Anna host sampling.",
+  "host_capabilities": [
+    "llm.sample"
+  ],
+  "tools": [
+    {
+      "name": "summarize",
+      "description": "Summarize the current notes in two or three concise sentences.",
+      "timeout": 75,
+      "parameters": [
+        {
+          "name": "notes",
+          "type": "array",
+          "description": "Notes in display order.",
+          "items": {
+            "type": "object"
+          },
+          "required": true
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "type": "python",
+    "min_version": "3.11"
+  }
+}
+

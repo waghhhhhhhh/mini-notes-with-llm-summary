@@ -1,0 +1,3 @@
+cache-dir = ".cache/uv"
+python-downloads = "never"
+
