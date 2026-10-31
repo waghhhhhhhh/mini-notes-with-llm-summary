@@ -1,6 +1,27 @@
 {
+  "slug": "mini-notes-summarizer",
+  "name": "Mini Notes Summarizer",
+  "version": "0.1.0",
+  "executa_type": "tool",
+  "description": "Summarizes Mini Notes through Anna host sampling.",
   "tool_id": "tool-dev-mini-notes-summarizer",
   "type": "python",
-  "manifest_file": "manifest.json"
+  "manifest_file": "manifest.json",
+  "distribution": {
+    "type": "binary",
+    "binary_artifacts": {
+      "darwin-arm64": {
+        "path": "dist/assets/mini-notes-summarizer-darwin-arm64.tar.gz",
+        "entrypoint": "bin/mini-notes-summarizer"
+      },
+      "darwin-x86_64": {
+        "path": "dist/assets/mini-notes-summarizer-darwin-x86_64.tar.gz",
+        "entrypoint": "bin/mini-notes-summarizer"
+      },
+      "windows-x86_64": {
+        "path": "dist/assets/mini-notes-summarizer-windows-x86_64.zip",
+        "entrypoint": "bin/mini-notes-summarizer.exe"
+      }
+    }
+  }
 }
-

@@ -4,6 +4,10 @@
   "tagline": "Capture notes and summarize them with Anna.",
   "description": "A small notes workspace backed by Anna storage, with summaries generated through a bundled Executa and host sampling.",
   "category": "productivity",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "bundled_executas": {
+    "mini-notes-summarizer": {
+      "path": "executas/mini-notes-summarizer"
+    }
+  }
 }
-

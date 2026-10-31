@@ -14,8 +14,15 @@ on:
 permissions:
   contents: write
 
+env:
+  UV_CACHE_DIR: ${{ github.workspace }}/.cache/uv
+  UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/python
+  UV_PYTHON_DOWNLOADS: never
+  UV_TOOL_DIR: ${{ github.workspace }}/.cache/uv-tools
+  UV_TOOL_BIN_DIR: ${{ github.workspace }}/.cache/uv-bin
+
 jobs:
-  build-ui:
+  verify-app:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,8 +32,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: pnpm install --no-frozen-lockfile
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm setup:python
+      - run: pnpm sync:python
       - run: pnpm build
+      - run: pnpm validate
+      - run: pnpm test
 
   build-executa:
     strategy:
@@ -49,19 +64,63 @@ jobs:
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v6
+      - name: Resolve release version
+        shell: bash
+        env:
+          RAW_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: |
+          version="${RAW_VERSION#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "invalid release version: $RAW_VERSION" >&2
+            exit 1
+          fi
+          echo "EXECUTA_VERSION=$version" >> "$GITHUB_ENV"
       - run: uv venv .venv --python 3.12 --no-python-downloads
       - run: uv sync --no-python-downloads
-      - run: uv run python scripts/build_binary.py --platform ${{ matrix.platform }}
+      - name: Build and smoke-test binary
+        shell: bash
+        run: |
+          uv run python scripts/build_binary.py \
+            --platform "${{ matrix.platform }}" \
+            --version "$EXECUTA_VERSION"
       - name: Smoke test JSON-RPC
-        run: uv run python tests/smoke_executa.py dist/stage/${{ matrix.platform }}/bin/${{ matrix.binary }}
+        shell: bash
+        run: |
+          uv run python tests/smoke_executa.py \
+            "executas/mini-notes-summarizer/dist/stage/${{ matrix.platform }}/bin/${{ matrix.binary }}" \
+            --expected-version "$EXECUTA_VERSION"
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
-          path: dist/assets/*
+          path: executas/mini-notes-summarizer/dist/assets/*
+          if-no-files-found: error
+
+  verify-release:
+    needs: [verify-app, build-executa]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: release-assets
+      - name: Verify the complete release asset set
+        shell: bash
+        env:
+          RAW_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: |
+          version="${RAW_VERSION#v}"
+          python tests/verify_release_assets.py \
+            --assets-dir release-assets \
+            --version "$version"
 
   release:
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-    needs: [build-ui, build-executa]
+    needs: [verify-release]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

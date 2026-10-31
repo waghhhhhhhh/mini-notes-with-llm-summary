@@ -130,9 +130,21 @@ pnpm build:binary
 Use `pnpm build:binary` after `pnpm setup:python && pnpm sync:python` so the
 build runs from the project virtual environment.
 
-Release assets are written to `dist/assets/`. GitHub Actions builds
-`darwin-arm64`, `darwin-x86_64`, and `windows-x86_64`, then attaches the
-archives to a GitHub Release.
+The default version is `0.1.0`. Pass a Semantic Version for a release build:
+
+```bash
+node scripts/run-python.mjs scripts/build_binary.py --version 1.2.3
+```
+
+The version is embedded in the Executa `describe` response and the archive
+root `manifest.json`. Release assets are written to
+`executas/mini-notes-summarizer/dist/assets/`.
+
+GitHub Actions verifies the App, unit harness and protocol tests, builds
+`darwin-arm64`, `darwin-x86_64`, and `windows-x86_64`, checks every archive's
+identity, version, and entrypoint, then attaches the archives to a GitHub
+Release. `workflow_dispatch` uses its `version` input; tag pushes derive the
+version from the tag after removing an optional leading `v`.
 
 ## How the pieces fit
 

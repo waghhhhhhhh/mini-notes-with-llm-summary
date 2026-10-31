@@ -8,6 +8,7 @@ import subprocess
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("binary")
+    parser.add_argument("--expected-version")
     args = parser.parse_args()
 
     process = subprocess.Popen(
@@ -41,6 +42,14 @@ def main() -> None:
             raise RuntimeError(f"unexpected manifest identity: {manifest.get('name')}")
         if "llm.sample" not in manifest.get("host_capabilities", []):
             raise RuntimeError("llm.sample capability is missing")
+        if (
+            args.expected_version
+            and manifest.get("version") != args.expected_version
+        ):
+            raise RuntimeError(
+                "unexpected manifest version: "
+                f"{manifest.get('version')} != {args.expected_version}"
+            )
     finally:
         process.stdin.close()
         try:
@@ -54,4 +63,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

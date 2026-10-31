@@ -4,22 +4,44 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 
 PROTOCOL_VERSION_V2 = "2.0"
 TOOL_NAME = "summarize"
+DEFAULT_TOOL_VERSION = "0.1.0"
+
+
+def _tool_version() -> str:
+    override = os.environ.get("MINI_NOTES_SUMMARIZER_VERSION")
+    if override:
+        return override
+
+    bundle_root = Path(
+        getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)
+    )
+    version_file = bundle_root / "version.txt"
+    if version_file.is_file():
+        packaged = version_file.read_text(encoding="utf-8").strip()
+        if packaged:
+            return packaged
+    return DEFAULT_TOOL_VERSION
+
+
+TOOL_VERSION = _tool_version()
 
 MANIFEST: dict[str, Any] = {
     "name": "tool-dev-mini-notes-summarizer",
     "display_name": "Mini Notes Summarizer",
-    "version": "0.1.0",
+    "version": TOOL_VERSION,
     "description": (
         "Summarizes the current Mini Notes collection through Anna host sampling."
     ),
@@ -390,4 +412,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
